@@ -110,7 +110,7 @@ defined class TaskImpl
 .pull-right[
 ```scala
 scala> val task = new TaskImpl
-task: TaskImpl = TaskImpl@4512a824
+task: TaskImpl = TaskImpl@66b0526c
 
 scala> task.run("arg1")
 res2: List[String] = List(arg1)
@@ -148,7 +148,7 @@ scala> val p3 = Person.jacek
 p3: Person = Person(jacek)
 
 scala> val p4 = Person
-p4: Person.type = Person$@74df5e92
+p4: Person.type = Person$@371cd74f
 
 scala> p4 eq Person
 res4: Boolean = true
@@ -168,10 +168,10 @@ object User {
 .pull-right[
 ```scala
 scala> val jan1 = User.apply("jan")
-jan1: User = User@1c1ade3a
+jan1: User = User@6534d45e
 
 scala> val jan = User("jan")
-jan: User = User@60ccfc44
+jan: User = User@7c5e147e
 
 scala> s"${jan.name}"
 res5: String = jan
@@ -379,7 +379,7 @@ first: [A](a: A)(l: List[A])A
 .pull-right[
 ```scala
 scala> val shead = first("") _
-shead: List[String] => String = $$Lambda$7602/194588520@7dafaf83
+shead: List[String] => String = $$Lambda$5259/1874979666@24d2b02d
 
 scala> shead(List())
 res19: String = ""
@@ -395,14 +395,14 @@ public <A> A first(a: A, list: List[A])
 ```scala
 scala> val head: String => List[String] => String =
      |   first
-head: String => (List[String] => String) = $$Lambda$7616/1419283846@5e4217fb
+head: String => (List[String] => String) = $$Lambda$5273/274175570@18d5633a
 ```
 ]
 --
 .pull-right[
 ```scala
 scala> val shead2 = head("")
-shead2: List[String] => String = $$Lambda$7617/450144043@d8ebe4f
+shead2: List[String] => String = $$Lambda$5274/1891050355@164ce424
 ```
 ]
 ---
