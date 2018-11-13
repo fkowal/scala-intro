@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Introduction to Scala</title>
+    <meta charset="utf-8">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body { font-family: 'Droid Serif', 'Helvetica'; }
+        h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz', 'Gill Sans';
+            font-weight: normal;
+        }
+        .pull-left {
+            float: left;
+            width: 47%;
+        }
+        .pull-right {
+            float: right;
+            width: 47%;
+        }
+        table {
+            border-collapse: collapse;
+            display: inline-block;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}
+        .large { font-size: 36px; }
+
+        .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono', 'Consolas', 'Courier New'; }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Scala for Java developers
+`@fkowal`
+
+Code and slides at `fkowal/scala-intro` on GitHub
+
+---
+class: center, middle
+
+# Types
+
+---
+# Classes
+
+
+.pull-left[
+```tut:silent
+class Class1(name: String)
+val m = new Class1("name")
+```
+
+```tut:fail
+m.name()
+```
+]
+
+--
+.pull-right[
+```tut:silent
+class Class2(val name: String)
+val c2 = new Class2("name")
+```
+
+```tut:nofail
+c2.name
+```
+]
+
+
+---
+# Interfaces
+
+
+.pull-left[
+```tut:silent
+trait Task {
+  def run(arg1: String): List[String]
+
+  def runWithDefault: List[String] = {
+    run("default")
+  }
+}
+```
+
+```tut:nofail
+class TaskImpl extends Task {
+  override def run(arg1: String): List[String] = {
+    List(arg1)
+  }
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val task = new TaskImpl
+task.run("arg1")
+task.runWithDefault
+```]
+---
+# Objects
+## Singleton pattern
+.pull-left[
+```tut:silent
+class Person(val name: String) {
+  override def toString = s"Person($name)"
+}
+object Person {
+  val manius = new Person("maniek")
+
+  def macius = new Person("macius")
+
+  def jacek() = new Person("jacek")
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val p1 = Person.manius
+val p2 = Person.macius
+val p3 = Person.jacek
+
+val p4 = Person
+
+p4 eq Person
+```
+]
+---
+# .apply
+.pull-left[
+```tut:silent
+class User(val name: String)
+object User {
+  def apply(name: String): User = new User(name)
+}
+```
+]
+--
+.pull-right[
+```tut
+val jan1 = User.apply("jan")
+val jan = User("jan")
+s"${jan.name}"
+```
+]
+---
+# Case Class
+.pull-left[
+```tut:silent
+case class City(name: String)
+case class Address(street: String, city: City, postcode: Int)
+```
+```tut
+val addr = Address("sw. marcin", City("poznan"), 61022)
+```
+]
+--
+.pull-right[
+```tut:nofail
+addr == addr
+val a2 = addr.copy(street = "inna")
+
+addr == a2
+```
+]
+
+---
+# Sealed classes
+.pull-left[
+```tut:silent
+sealed trait User
+case class Admin(rights: List[Int]) extends User
+case class Tester(name: String) extends User
+case object Guest extends User
+
+object User {
+  def apply(random: Int): User = 
+    if (random == 0) Guest
+    else if (random < 0) Tester(s"$random")
+    else admin(List(Math.abs(random)))
+  
+  def admin(rights: List[Int]) = Admin(rights)
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+User(0) == Guest
+User(-1) == Tester("-1")
+User(123) == Admin(List(123))
+```
+]
+
+---
+# Pattern matching / Deconstruction
+.pull-left[
+```tut:silent
+sealed trait Scheme
+case object Http extends Scheme
+case object Ftp extends Scheme
+case class Other(name: String) extends Scheme
+
+case class Uri(proto: Scheme, host: String, port: Int) {
+  override def toString = 
+    this match {
+      case Uri(Ftp, host, _) => 
+      "ftp://$host"
+      case Uri(Http, host, port) if port == 443 => 
+        "https://$host"
+      case Uri(Other(scheme), host, port) => 
+        s"$scheme://$host:$port"
+      case Uri(Http, host, port) => 
+        s"http://$host"
+    }
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val google = Uri(Http, "google.pl", 80)
+
+val service = Uri(Other("service"), "mskip-service", 80)
+```
+]
+
+---
+# Type parameters
+
+.pull-left[
+```tut:silent
+class Task[T](arg: T) {
+  override def toString = s"Task($arg)"
+}
+
+object Task {
+  def apply[T](t: T): Task[T] = new Task(t)
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val s = Task("string")
+val i = Task(123)
+```
+]
+
+---
+# Tuples
+.pull-left[
+```tut:silent
+val pair = ("maciej", false)
+val tripple = ("maciej", true, 38)
+val tripple2 = Tuple3("maciej", true, 38)
+```
+
+```tut:silent
+val pair2 = "maciej" -> false
+val pair3 = Tuple2("maciej", false)
+```
+]
+--
+.pull-right[
+```tut:nofail
+pair == pair2
+
+pair
+
+pair._1
+pair._2
+tripple._3
+```
+]
+---
+# Functions
+.pull-left[
+```tut:silent
+def fn1(n: Int): String = n.toString
+
+val fn2 = (n: Int) => n.toString
+
+val fn3 = new Function1[Int, String] {
+  def apply(n: Int): String = n.toString
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+fn1(1)
+fn2(2)
+fn3(3)
+```
+]
+
+---
+# Partially applied functions
+.pull-left[
+```tut
+def first(l: List[String]): String = ???
+```
+]
+<br clear="left"/>
+--
+.pull-left[
+```tut
+def first[A](a: A)(l: List[A]): A = {
+    if (l.isEmpty) a
+    else l.head
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val shead = first("") _
+shead(List())
+
+```
+
+```java
+public <A> A first(a: A, list: List[A])
+```
+]
+---
+# Curried functions
+.pull-left[
+```tut
+val head: String => List[String] => String =
+  first
+```
+]
+--
+.pull-right[
+```tut:nofail
+val shead2 = head("")
+```
+]
+---
+# Implicit arguments
+
+```tut:silent
+def doNewItemExt(args: Any, c: Int, k: String, s: String): String = 
+  s"${args} c:$c, k:$k, s:$s"
+```
+
+--
+```tut
+doNewItemExt("allargs", 1, "key", "sesja")
+```
+---
+# Implicit arguments
+```tut:silent
+case class Country(c: Int)
+case class WebapiKey(k: String)
+case class Session(s: String)
+
+def doNewItemExt2(args: Any)(implicit c: Country, k: WebapiKey, s: Session): String =
+  doNewItemExt(args, c.c, k.k, s.s)
+```
+--
+```tut
+implicit val c = Country(1)
+implicit val k = WebapiKey("key")
+implicit val s = Session("session")
+
+doNewItemExt2("other args")
+```
+---
+# Option
+.pull-left[
+```tut:silent
+sealed trait Maybe[+T]
+case class Just[T](t: T) extends Maybe[T]
+case object None extends Maybe[Nothing]
+```
+]
+--
+.pull-right[
+```tut:nofail
+val maybei: Maybe[Int] = Just(123)
+val maybei2: Maybe[Int] = None
+```
+]
+
+---
+# Either
+.pull-left[
+```tut:silent
+sealed trait Or[+A, +B]
+case class Left[A, B](a: A) extends Or[A, B]
+case class Right[A, B](b: B) extends Or[A, B]
+```
+]
+--
+.pull-right[
+```tut:nofail
+val sori: String Or Int = Left("blad")
+val sori2: String Or Int = Right(123)
+```
+]
+
+---
+#
+.pull-left[
+```tut:silent
+```
+]
+--
+.pull-right[
+```tut:nofail
+```
+]
+
+---
+#
+.pull-left[
+```tut:silent
+```
+]
+--
+.pull-right[
+```tut:nofail
+```
+]
+
+---
+#
+.pull-left[
+```tut:silent
+```
+]
+--
+.pull-right[
+```tut:nofail
+```
+]
+
+---
+#
+.pull-left[
+```tut:silent
+```
+]
+--
+.pull-right[
+```tut:nofail
+```
+]
+
+---
+class: center, middle
+
+# Thanks!
+Code and slides at `fkowal/scala-intro` on GitHub
+
+
+
+ </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: "16:9",
+        slideNumberFormat: '%current%',
+    });
+</script>
+</body>
+</html>

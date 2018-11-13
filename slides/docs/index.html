@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Introduction to Scala</title>
+    <meta charset="utf-8">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+        @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+        body { font-family: 'Droid Serif', 'Helvetica'; }
+        h1, h2, h3 {
+            font-family: 'Yanone Kaffeesatz', 'Gill Sans';
+            font-weight: normal;
+        }
+        .pull-left {
+            float: left;
+            width: 47%;
+        }
+        .pull-right {
+            float: right;
+            width: 47%;
+        }
+        table {
+            border-collapse: collapse;
+            display: inline-block;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}
+        .large { font-size: 36px; }
+
+        .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono', 'Consolas', 'Courier New'; }
+    </style>
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle
+
+# Scala for Java developers
+`@fkowal`
+
+Code and slides at `fkowal/scala-intro` on GitHub
+
+---
+class: center, middle
+
+# Types
+
+---
+# Classes
+
+
+.pull-left[
+```scala
+class Class1(name: String)
+val m = new Class1("name")
+```
+
+```scala
+scala> m.name()
+<console>:14: error: value name is not a member of Class1
+       m.name()
+         ^
+```
+]
+
+--
+.pull-right[
+```scala
+class Class2(val name: String)
+val c2 = new Class2("name")
+```
+
+```scala
+scala> c2.name
+res1: String = name
+```
+]
+
+
+---
+# Interfaces
+
+
+.pull-left[
+```scala
+trait Task {
+  def run(arg1: String): List[String]
+
+  def runWithDefault: List[String] = {
+    run("default")
+  }
+}
+```
+
+```scala
+scala> class TaskImpl extends Task {
+     |   override def run(arg1: String): List[String] = {
+     |     List(arg1)
+     |   }
+     | }
+defined class TaskImpl
+```
+]
+--
+.pull-right[
+```scala
+scala> val task = new TaskImpl
+task: TaskImpl = TaskImpl@4512a824
+
+scala> task.run("arg1")
+res2: List[String] = List(arg1)
+
+scala> task.runWithDefault
+res3: List[String] = List(default)
+```]
+---
+# Objects
+## Singleton pattern
+.pull-left[
+```scala
+class Person(val name: String) {
+  override def toString = s"Person($name)"
+}
+object Person {
+  val manius = new Person("maniek")
+
+  def macius = new Person("macius")
+
+  def jacek() = new Person("jacek")
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> val p1 = Person.manius
+p1: Person = Person(maniek)
+
+scala> val p2 = Person.macius
+p2: Person = Person(macius)
+
+scala> val p3 = Person.jacek
+p3: Person = Person(jacek)
+
+scala> val p4 = Person
+p4: Person.type = Person$@74df5e92
+
+scala> p4 eq Person
+res4: Boolean = true
+```
+]
+---
+# .apply
+.pull-left[
+```scala
+class User(val name: String)
+object User {
+  def apply(name: String): User = new User(name)
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> val jan1 = User.apply("jan")
+jan1: User = User@1c1ade3a
+
+scala> val jan = User("jan")
+jan: User = User@60ccfc44
+
+scala> s"${jan.name}"
+res5: String = jan
+```
+]
+---
+# Case Class
+.pull-left[
+```scala
+case class City(name: String)
+case class Address(street: String, city: City, postcode: Int)
+```
+```scala
+scala> val addr = Address("sw. marcin", City("poznan"), 61022)
+addr: Address = Address(sw. marcin,City(poznan),61022)
+```
+]
+--
+.pull-right[
+```scala
+scala> addr == addr
+res6: Boolean = true
+
+scala> val a2 = addr.copy(street = "inna")
+a2: Address = Address(inna,City(poznan),61022)
+
+scala> addr == a2
+res7: Boolean = false
+```
+]
+
+---
+# Sealed classes
+.pull-left[
+```scala
+sealed trait User
+case class Admin(rights: List[Int]) extends User
+case class Tester(name: String) extends User
+case object Guest extends User
+
+object User {
+  def apply(random: Int): User = 
+    if (random == 0) Guest
+    else if (random < 0) Tester(s"$random")
+    else admin(List(Math.abs(random)))
+  
+  def admin(rights: List[Int]) = Admin(rights)
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> User(0) == Guest
+res8: Boolean = true
+
+scala> User(-1) == Tester("-1")
+res9: Boolean = true
+
+scala> User(123) == Admin(List(123))
+res10: Boolean = true
+```
+]
+
+---
+# Pattern matching / Deconstruction
+.pull-left[
+```scala
+sealed trait Scheme
+case object Http extends Scheme
+case object Ftp extends Scheme
+case class Other(name: String) extends Scheme
+
+case class Uri(proto: Scheme, host: String, port: Int) {
+  override def toString = 
+    this match {
+      case Uri(Ftp, host, _) => 
+      "ftp://$host"
+      case Uri(Http, host, port) if port == 443 => 
+        "https://$host"
+      case Uri(Other(scheme), host, port) => 
+        s"$scheme://$host:$port"
+      case Uri(Http, host, port) => 
+        s"http://$host"
+    }
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> val google = Uri(Http, "google.pl", 80)
+google: Uri = http://google.pl
+
+scala> val service = Uri(Other("service"), "mskip-service", 80)
+service: Uri = service://mskip-service:80
+```
+]
+
+---
+# Type parameters
+
+.pull-left[
+```scala
+class Task[T](arg: T) {
+  override def toString = s"Task($arg)"
+}
+
+object Task {
+  def apply[T](t: T): Task[T] = new Task(t)
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> val s = Task("string")
+s: Task[String] = Task(string)
+
+scala> val i = Task(123)
+i: Task[Int] = Task(123)
+```
+]
+
+---
+# Tuples
+.pull-left[
+```scala
+val pair = ("maciej", false)
+val tripple = ("maciej", true, 38)
+val tripple2 = Tuple3("maciej", true, 38)
+```
+
+```scala
+val pair2 = "maciej" -> false
+val pair3 = Tuple2("maciej", false)
+```
+]
+--
+.pull-right[
+```scala
+scala> pair == pair2
+res11: Boolean = true
+
+scala> pair
+res12: (String, Boolean) = (maciej,false)
+
+scala> pair._1
+res13: String = maciej
+
+scala> pair._2
+res14: Boolean = false
+
+scala> tripple._3
+res15: Int = 38
+```
+]
+---
+# Functions
+.pull-left[
+```scala
+def fn1(n: Int): String = n.toString
+
+val fn2 = (n: Int) => n.toString
+
+val fn3 = new Function1[Int, String] {
+  def apply(n: Int): String = n.toString
+}
+```
+]
+--
+.pull-right[
+```scala
+scala> fn1(1)
+res16: String = 1
+
+scala> fn2(2)
+res17: String = 2
+
+scala> fn3(3)
+res18: String = 3
+```
+]
+
+---
+# Partially applied functions
+.pull-left[
+```scala
+scala> def first(l: List[String]): String = ???
+first: (l: List[String])String
+```
+]
+<br clear="left"/>
+--
+.pull-left[
+```scala
+scala> def first[A](a: A)(l: List[A]): A = {
+     |     if (l.isEmpty) a
+     |     else l.head
+     | }
+first: [A](a: A)(l: List[A])A
+```
+]
+--
+.pull-right[
+```scala
+scala> val shead = first("") _
+shead: List[String] => String = $$Lambda$7602/194588520@7dafaf83
+
+scala> shead(List())
+res19: String = ""
+```
+
+```java
+public <A> A first(a: A, list: List[A])
+```
+]
+---
+# Curried functions
+.pull-left[
+```scala
+scala> val head: String => List[String] => String =
+     |   first
+head: String => (List[String] => String) = $$Lambda$7616/1419283846@5e4217fb
+```
+]
+--
+.pull-right[
+```scala
+scala> val shead2 = head("")
+shead2: List[String] => String = $$Lambda$7617/450144043@d8ebe4f
+```
+]
+---
+# Implicit arguments
+
+```scala
+def doNewItemExt(args: Any, c: Int, k: String, s: String): String = 
+  s"${args} c:$c, k:$k, s:$s"
+```
+
+--
+```scala
+scala> doNewItemExt("allargs", 1, "key", "sesja")
+res20: String = allargs c:1, k:key, s:sesja
+```
+---
+# Implicit arguments
+```scala
+case class Country(c: Int)
+case class WebapiKey(k: String)
+case class Session(s: String)
+
+def doNewItemExt2(args: Any)(implicit c: Country, k: WebapiKey, s: Session): String =
+  doNewItemExt(args, c.c, k.k, s.s)
+```
+--
+```scala
+scala> implicit val c = Country(1)
+c: Country = Country(1)
+
+scala> implicit val k = WebapiKey("key")
+k: WebapiKey = WebapiKey(key)
+
+scala> implicit val s = Session("session")
+s: Session = Session(session)
+
+scala> doNewItemExt2("other args")
+res21: String = other args c:1, k:key, s:session
+```
+---
+# Option
+.pull-left[
+```scala
+sealed trait Maybe[+T]
+case class Just[T](t: T) extends Maybe[T]
+case object None extends Maybe[Nothing]
+```
+]
+--
+.pull-right[
+```scala
+scala> val maybei: Maybe[Int] = Just(123)
+maybei: Maybe[Int] = Just(123)
+
+scala> val maybei2: Maybe[Int] = None
+maybei2: Maybe[Int] = None
+```
+]
+
+---
+# Either
+.pull-left[
+```scala
+sealed trait Or[+A, +B]
+case class Left[A, B](a: A) extends Or[A, B]
+case class Right[A, B](b: B) extends Or[A, B]
+```
+]
+--
+.pull-right[
+```scala
+scala> val sori: String Or Int = Left("blad")
+sori: Or[String,Int] = Left(blad)
+
+scala> val sori2: String Or Int = Right(123)
+sori2: Or[String,Int] = Right(123)
+```
+]
+
+---
+#
+.pull-left[
+```scala
+```
+]
+--
+.pull-right[
+```scala
+```
+]
+
+---
+#
+.pull-left[
+```scala
+```
+]
+--
+.pull-right[
+```scala
+```
+]
+
+---
+#
+.pull-left[
+```scala
+```
+]
+--
+.pull-right[
+```scala
+```
+]
+
+---
+#
+.pull-left[
+```scala
+```
+]
+--
+.pull-right[
+```scala
+```
+]
+
+---
+class: center, middle
+
+# Thanks!
+Code and slides at `fkowal/scala-intro` on GitHub
+
+
+
+ </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: "16:9",
+        slideNumberFormat: '%current%',
+    });
+</script>
+</body>
+</html>
