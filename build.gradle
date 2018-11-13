@@ -1,0 +1,35 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'cz.alenkacz', name: 'gradle-scalafmt', version: '1.7.0'
+    }
+}
+
+plugins {
+    id 'scala'
+}
+apply plugin: 'scalafmt'
+
+group 'pl.demo'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+sourceCompatibility = 1.8
+
+dependencies {
+    compile group: 'org.scala-lang', 			    name: 'scala-library', 				    version: '2.12.7'
+    compile group: 'org.scala-lang', 			    name: 'scala-reflect', 				    version: '2.12.7'
+
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.0.2"
+    testCompile 'org.spockframework:spock-core:1.2-groovy-2.5'
+
+}
+
+wrapper {
+    gradleVersion = '4.10.2'
+}
