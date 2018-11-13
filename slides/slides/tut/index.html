@@ -43,7 +43,7 @@ class: center, middle
 # Scala for Java developers
 `@fkowal`
 
-Code and slides at `fkowal/scala-intro` on GitHub
+Code and slides at <a href="https://github.com/fkowal/scala-intro">`fkowal/scala-intro`</a> on GitHub
 
 ---
 class: center, middle
@@ -77,7 +77,10 @@ c2.name
 ```
 ]
 
+---
+class: center, middle
 
+<a href="https://www.scala-exercises.org/std_lib/classes">Exercises</a>
 ---
 # Interfaces
 
@@ -109,8 +112,11 @@ task.run("arg1")
 task.runWithDefault
 ```]
 ---
-# Objects
-## Singleton pattern
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/traits">Exercises</a>
+---
+# Objects / Singleton pattern
 .pull-left[
 ```tut:silent
 class Person(val name: String) {
@@ -137,6 +143,10 @@ val p4 = Person
 p4 eq Person
 ```
 ]
+---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/objects">Exercises</a>
 ---
 # .apply
 .pull-left[
@@ -175,7 +185,10 @@ val a2 = addr.copy(street = "inna")
 addr == a2
 ```
 ]
+---
+class: center, middle
 
+<a href="https://www.scala-exercises.org/std_lib/case_classes">Exercises</a>
 ---
 # Sealed classes
 .pull-left[
@@ -238,6 +251,10 @@ val service = Uri(Other("service"), "mskip-service", 80)
 ]
 
 ---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/pattern_matching">Exercises</a>
+---
 # Type parameters
 
 .pull-left[
@@ -262,13 +279,13 @@ val i = Task(123)
 ---
 # Tuples
 .pull-left[
-```tut:silent
+```tut
 val pair = ("maciej", false)
 val tripple = ("maciej", true, 38)
 val tripple2 = Tuple3("maciej", true, 38)
 ```
 
-```tut:silent
+```tut
 val pair2 = "maciej" -> false
 val pair3 = Tuple2("maciej", false)
 ```
@@ -285,6 +302,10 @@ pair._2
 tripple._3
 ```
 ]
+---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/tuples">Exercises</a>
 ---
 # Functions
 .pull-left[
@@ -307,6 +328,10 @@ fn3(3)
 ```
 ]
 
+---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/higher_order_functions">Exercises</a>
 ---
 # Partially applied functions
 .pull-left[
@@ -336,6 +361,10 @@ shead(List())
 public <A> A first(a: A, list: List[A])
 ```
 ]
+---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/partially_applied_functions">Exercises</a>
 ---
 # Curried functions
 .pull-left[
@@ -415,9 +444,36 @@ val sori2: String Or Int = Right(123)
 ]
 
 ---
-#
+# Try
 .pull-left[
 ```tut:silent
+sealed trait Try[+T]
+case class Failure[T](ex: Throwable) extends Try[T]
+case class Success[T](value: T) extends Try[T]
+object Try {
+  def apply[T](run: => T) = 
+    try {
+      Success(run)
+    } catch {
+      case ex: Throwable => Failure(ex)
+    }
+}
+```
+]
+--
+.pull-right[
+```tut:nofail
+val failed = Try { throw new RuntimeException("nope") }
+val yessss = Try { "got result" }
+```
+]
+
+---
+# Lists
+.pull-left[
+```tut:silent
+val l1 = List(1,2,3,4)
+val l2 = 1 :: 2 :: 3 :: 4 :: Nil
 ```
 ]
 --
@@ -427,9 +483,14 @@ val sori2: String Or Int = Right(123)
 ]
 
 ---
-#
+# Map
 .pull-left[
 ```tut:silent
+val m1 = Map(
+  "key1" -> 1,
+  "key2" -> 2,
+  ("key3", 3)
+)
 ```
 ]
 --
@@ -439,34 +500,74 @@ val sori2: String Or Int = Right(123)
 ]
 
 ---
-#
+# Extension methods
 .pull-left[
 ```tut:silent
+object Syntax {
+  implicit class TrimSyntax(val s: String) extends AnyVal {
+    def bark(): String =
+      s"$s woff"
+  }
+}
 ```
 ]
 --
 .pull-right[
-```tut:nofail
+```tut:fail
+"a dog sais".bark()
 ```
 ]
-
+--
+.pull-right[
+```tut
+import Syntax._
+"a dog sais".bark()
+```
+]
 ---
-#
-.pull-left[
+# Typeclasses / Adhoc Polimorphism
 ```tut:silent
+trait Show[T] {
+  def show(t: T): String
+}
 ```
-]
 --
-.pull-right[
-```tut:nofail
+```tut:silent
+object Show {
+  implicit class ShowSyntax[T](val t: T) {
+    def show(implicit s: Show[T]): String =
+      s.show(t)
+  }
+}
 ```
-]
+---
+# Higher Kinded Types
+
+```scala
+type F[A] = Option[E]
+type F[A] = Either[E, A] // for some type E
+type F[A] = List[A]
+type F[A] = Future[A]
+
+```
+--
+```scala
+trait Functor[F[_]] {
+  def map[A, B](fn: A => B)(f: F[A]): F[B]
+}
+object Functor {
+  implicit class FunctorSyntax[A, F[_]](val f: F[A]) extends AnyVal {
+    def map[B](fn: A => B)(implicit functor: Functor[F]): F[B] =
+      functor.map(fn)(f)
+  }
+}
+```
 
 ---
 class: center, middle
 
 # Thanks!
-Code and slides at `fkowal/scala-intro` on GitHub
+Code and slides at <a href="https://github.com/fkowal/scala-intro">`fkowal/scala-intro`</a> on GitHub
 
 
 
