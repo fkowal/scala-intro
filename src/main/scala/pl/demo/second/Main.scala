@@ -5,6 +5,9 @@ import java.time.LocalDate
 
 import pl.demo.second.Main.TaskBoard
 
+import scala.reflect.internal.util.TableDef
+import scala.reflect.internal.util.TableDef.Column
+
 object Main {
   /*
     One of the teams used task board to organize their work in project aimed to launch
@@ -36,27 +39,7 @@ object Main {
 
     Fill Column enum according to task board description above.
    */
-//enum class Column {
-//  TODO,
-//  IN_PROGRESS,
-//  TO_VERIFY,
-//  DONE
-//}
-  sealed trait Column
-  case object TODO extends Column
-  case object IN_PROGRESS extends Column
-  case object TO_VERIFY extends Column
-  case object DONE extends Column
-
-  object Column {
-    def apply(column: String): Column =
-      column match {
-        case "TODO"        => TODO
-        case "IN_PROGRESS" => IN_PROGRESS
-        case "TO_VERIFY"   => TO_VERIFY
-        case "DONE"        => DONE
-      }
-  }
+  type Column
 
   /*
     STEP 2:
@@ -72,17 +55,6 @@ object Main {
     val date: LocalDate
     val taskName: String
   }
-  case class CreateEvent(override val date: LocalDate,
-                         override val taskName: String,
-                         dificulty: Int)
-      extends TaskEvent
-  case class MoveEvent(override val date: LocalDate,
-                       override val taskName: String,
-                       column: Column)
-      extends TaskEvent
-  case class RemoveEvent(override val date: LocalDate,
-                         override val taskName: String)
-      extends TaskEvent
 
   /*
     STEP 3:
@@ -103,27 +75,7 @@ object Main {
       .asScala
       .toList
       .map(_.split(","))
-      .map(
-        strs =>
-          strs(2) match {
-            case "CREATED" =>
-              CreateEvent(
-                date = LocalDate.parse(strs(0)),
-                taskName = strs(1),
-                dificulty =
-                  if (strs.length == 4) strs(3).toInt else DEFAULT_DIFFICULTY
-              )
-            case "DELETED" =>
-              RemoveEvent(date = LocalDate.parse(strs(0)), taskName = strs(1))
-            case _ =>
-              MoveEvent(
-                date = LocalDate.parse(strs(0)),
-                taskName = strs(1),
-                column = Column(strs(3))
-              )
-
-        }
-      )
+      .map(_ => ???)
   }
 
   /*
@@ -144,12 +96,7 @@ object Main {
         to create one, also as immutable type,
     - use previously defined Column enum to represent columns.
    */
-  case class Task(name: String,
-                  dificulty: Int = DEFAULT_DIFFICULTY,
-                  column: Column = TODO) {
-    override def toString: String = s"$name - ($dificulty)"
-  }
-  case class TaskBoard(tasks: List[Task] = List()) {
+  class TaskBoard() {
 
     /*
       STEP 5:
@@ -161,20 +108,7 @@ object Main {
       - remember to apply default difficulty level,
       - in case of an error, throw IllegalArgumentException with meaningful message.
      */
-    def apply(event: TaskEvent): TaskBoard = event match {
-      case create: CreateEvent =>
-        this.copy(tasks :+ Task(event.taskName, create.dificulty))
-
-      case _: RemoveEvent =>
-        this.copy(tasks.filter(_.name != event.taskName))
-
-      case move: MoveEvent =>
-        this.copy(tasks.map {
-          case task: Task if task.name == event.taskName =>
-            task.copy(column = move.column)
-          case task => task
-        })
-    }
+    def apply(event: TaskEvent): TaskBoard = ???
 
     /*
       STEP 6:
@@ -207,14 +141,6 @@ object Main {
       - you can iterate over enum values and replace _ to whitespace to have column names.
      */
     def print(): Unit = {
-      println("TO DO:")
-      tasks.filter(_.column == TODO).foreach(println)
-      println("IN PROGRESS:")
-      tasks.filter(_.column == IN_PROGRESS).foreach(println)
-      println("TO VERIFY:")
-      tasks.filter(_.column == TO_VERIFY).foreach(println)
-      println("DONE:")
-      tasks.filter(_.column == DONE).foreach(println)
     }
   }
 }
@@ -240,13 +166,11 @@ object Run extends App {
   import Main._
 
   val path = getClass.getClassLoader.getResource("second/task_history.csv").getPath
-  val events = parseFile(path)
+  val events: List[TaskEvent] = parseFile(path)
 
-  def aggr(board: TaskBoard, event: TaskEvent): TaskBoard = board.apply(event)
-  //    val board = events.foldLeft(TaskBoard())(aggr) //{ (agg, ev) -> agg.apply(ev)})
-  val board = events
-    .filter(_.date.isBefore(LocalDate.parse("2017-01-16")))
-    .foldLeft(TaskBoard())(aggr)
+//  def aggr(board: TaskBoard, event: TaskEvent): TaskBoard = ??
+//  val board = events.foldLeft(TaskBoard())(aggr) //{ (agg, ev) -> agg.apply(ev)})
+  val board: TaskBoard = ???
 
   board.print()
 }
