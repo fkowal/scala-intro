@@ -113,7 +113,7 @@ defined class TaskImpl
 .pull-right[
 ```scala
 scala> val task = new TaskImpl
-task: TaskImpl = TaskImpl@7fc0572d
+task: TaskImpl = TaskImpl@12dbf8d1
 
 scala> task.run("arg1")
 res2: List[String] = List(arg1)
@@ -154,7 +154,7 @@ scala> val p3 = Person.jacek
 p3: Person = Person(jacek)
 
 scala> val p4 = Person
-p4: Person.type = Person$@1fca9e2
+p4: Person.type = Person$@c2fc6e4
 
 scala> p4 eq Person
 res4: Boolean = true
@@ -178,10 +178,10 @@ object User {
 .pull-right[
 ```scala
 scala> val jan1 = User.apply("jan")
-jan1: User = User@57a8de47
+jan1: User = User@62c17421
 
 scala> val jan = User("jan")
-jan: User = User@360e37bc
+jan: User = User@39ad862e
 
 scala> s"${jan.name}"
 res5: String = jan
@@ -412,7 +412,7 @@ first: [A](a: A)(l: List[A])A
 .pull-right[
 ```scala
 scala> val shead = first("") _
-shead: List[String] => String = $$Lambda$4388/1392347015@58060350
+shead: List[String] => String = $$Lambda$4394/1438620514@45a9b0ab
 
 scala> shead(List())
 res19: String = ""
@@ -432,14 +432,14 @@ class: center, middle
 ```scala
 scala> val head: String => List[String] => String =
      |   first
-head: String => (List[String] => String) = $$Lambda$4402/2045426414@38c023b1
+head: String => (List[String] => String) = $$Lambda$4408/1681269309@6b6a4f14
 ```
 ]
 --
 .pull-right[
 ```scala
 scala> val shead2 = head("")
-shead2: List[String] => String = $$Lambda$4403/623031355@6141517
+shead2: List[String] => String = $$Lambda$4409/379022925@20577b2b
 ```
 ]
 ---
@@ -479,6 +479,10 @@ s: Session = Session(session)
 scala> doNewItemExt2("other args")
 res21: String = other args c:1, k:key, s:session
 ```
+---
+class: center, middle
+
+<a href="https://www.scala-exercises.org/std_lib/implicits" target="_blank">Exercises</a>
 ---
 # Option
 .pull-left[
