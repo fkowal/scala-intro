@@ -50,6 +50,7 @@ class: center, middle
 
 # Types
 
+<img src="https://docs.scala-lang.org/resources/images/tour/unified-types-diagram.svg" width="80%"/>
 ---
 # Classes
 
@@ -101,19 +102,18 @@ trait Task {
 ```
 
 ```scala
-scala> class TaskImpl extends Task {
-     |   override def run(arg1: String): List[String] = {
-     |     List(arg1)
-     |   }
-     | }
-defined class TaskImpl
+class TaskImpl extends Task {
+  override def run(arg1: String): List[String] = {
+    List(arg1)
+  }
+}
 ```
 ]
 --
 .pull-right[
 ```scala
 scala> val task = new TaskImpl
-task: TaskImpl = TaskImpl@12dbf8d1
+task: TaskImpl = TaskImpl@612e0370
 
 scala> task.run("arg1")
 res2: List[String] = List(arg1)
@@ -154,7 +154,7 @@ scala> val p3 = Person.jacek
 p3: Person = Person(jacek)
 
 scala> val p4 = Person
-p4: Person.type = Person$@c2fc6e4
+p4: Person.type = Person$@546a3955
 
 scala> p4 eq Person
 res4: Boolean = true
@@ -178,10 +178,10 @@ object User {
 .pull-right[
 ```scala
 scala> val jan1 = User.apply("jan")
-jan1: User = User@62c17421
+jan1: User = User@1620a33b
 
 scala> val jan = User("jan")
-jan: User = User@39ad862e
+jan: User = User@22108b6f
 
 scala> s"${jan.name}"
 res5: String = jan
@@ -192,10 +192,18 @@ res5: String = jan
 .pull-left[
 ```scala
 case class City(name: String)
-case class Address(street: String, city: City, postcode: Int)
+case class Address(
+    street: String,
+    city: City,
+    postcode: Int
+)
 ```
 ```scala
-scala> val addr = Address("sw. marcin", City("poznan"), 61022)
+scala> val addr = Address(
+     |     street = "sw. marcin",
+     |     city = City("poznan"),
+     |     postcode = 61022
+     | )
 addr: Address = Address(sw. marcin,City(poznan),61022)
 ```
 ]
@@ -279,7 +287,10 @@ case class Uri(proto: Scheme, host: String, port: Int) {
 scala> val google = Uri(Http, "google.pl", 80)
 google: Uri = http://google.pl
 
-scala> val service = Uri(Other("service"), "mskip-service", 80)
+scala> val service = Uri(
+     |     Other("service"),
+     |     "mskip-service",
+     |     80)
 service: Uri = service://mskip-service:80
 ```
 ]
@@ -320,19 +331,19 @@ i: Task[Int] = Task(123)
 scala> val pair = ("maciej", false)
 pair: (String, Boolean) = (maciej,false)
 
-scala> val tripple = ("maciej", true, 38)
-tripple: (String, Boolean, Int) = (maciej,true,38)
-
-scala> val tripple2 = Tuple3("maciej", true, 38)
-tripple2: (String, Boolean, Int) = (maciej,true,38)
-```
-
-```scala
 scala> val pair2 = "maciej" -> false
 pair2: (String, Boolean) = (maciej,false)
 
 scala> val pair3 = Tuple2("maciej", false)
 pair3: (String, Boolean) = (maciej,false)
+```
+
+```scala
+scala> val tripple = ("maciej", true, 38)
+tripple: (String, Boolean, Int) = (maciej,true,38)
+
+scala> val tripple2 = Tuple3("maciej", true, 38)
+tripple2: (String, Boolean, Int) = (maciej,true,38)
 ```
 ]
 --
@@ -341,17 +352,16 @@ pair3: (String, Boolean) = (maciej,false)
 scala> pair == pair2
 res11: Boolean = true
 
-scala> pair
-res12: (String, Boolean) = (maciej,false)
-
 scala> pair._1
-res13: String = maciej
+res12: String = maciej
 
 scala> pair._2
-res14: Boolean = false
+res13: Boolean = false
+```
 
+```scala
 scala> tripple._3
-res15: Int = 38
+res14: Int = 38
 ```
 ]
 ---
@@ -375,13 +385,13 @@ val fn3 = new Function1[Int, String] {
 .pull-right[
 ```scala
 scala> fn1(1)
-res16: String = 1
+res15: String = 1
 
 scala> fn2(2)
-res17: String = 2
+res16: String = 2
 
 scala> fn3(3)
-res18: String = 3
+res17: String = 3
 ```
 ]
 
@@ -412,10 +422,10 @@ first: [A](a: A)(l: List[A])A
 .pull-right[
 ```scala
 scala> val shead = first("") _
-shead: List[String] => String = $$Lambda$4394/1438620514@45a9b0ab
+shead: List[String] => String = $$Lambda$4530/790914357@3db112c3
 
 scala> shead(List())
-res19: String = ""
+res18: String = ""
 ```
 
 ```java
@@ -428,20 +438,16 @@ class: center, middle
 <a href="https://www.scala-exercises.org/std_lib/partially_applied_functions" target="_blank">Exercises</a>
 ---
 # Curried functions
-.pull-left[
 ```scala
 scala> val head: String => List[String] => String =
      |   first
-head: String => (List[String] => String) = $$Lambda$4408/1681269309@6b6a4f14
+head: String => (List[String] => String) = $$Lambda$4544/1740742872@71339518
 ```
-]
 --
-.pull-right[
 ```scala
 scala> val shead2 = head("")
-shead2: List[String] => String = $$Lambda$4409/379022925@20577b2b
+shead2: List[String] => String = $$Lambda$4545/438355811@1bdd495c
 ```
-]
 ---
 # Implicit arguments
 
@@ -453,7 +459,7 @@ def doNewItemExt(args: Any, c: Int, k: String, s: String): String =
 --
 ```scala
 scala> doNewItemExt("allargs", 1, "key", "sesja")
-res20: String = allargs c:1, k:key, s:sesja
+res19: String = allargs c:1, k:key, s:sesja
 ```
 ---
 # Implicit arguments
@@ -477,7 +483,7 @@ scala> implicit val s = Session("session")
 s: Session = Session(session)
 
 scala> doNewItemExt2("other args")
-res21: String = other args c:1, k:key, s:session
+res20: String = other args c:1, k:key, s:session
 ```
 ---
 class: center, middle
@@ -559,11 +565,6 @@ val l1 = List(1,2,3,4)
 val l2 = 1 :: 2 :: 3 :: 4 :: Nil
 ```
 ]
---
-.pull-right[
-```scala
-```
-]
 
 ---
 # Map
@@ -576,12 +577,6 @@ val m1 = Map(
 )
 ```
 ]
---
-.pull-right[
-```scala
-```
-]
-
 ---
 # Extension methods
 .pull-left[
@@ -610,7 +605,7 @@ scala> import Syntax._
 import Syntax._
 
 scala> "a dog sais".bark()
-res23: String = a dog sais woff
+res22: String = a dog sais woff
 ```
 ]
 ---

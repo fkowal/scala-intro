@@ -50,6 +50,7 @@ class: center, middle
 
 # Types
 
+<img src="https://docs.scala-lang.org/resources/images/tour/unified-types-diagram.svg" width="80%"/>
 ---
 # Classes
 
@@ -96,7 +97,7 @@ trait Task {
 }
 ```
 
-```tut:nofail
+```tut:silent
 class TaskImpl extends Task {
   override def run(arg1: String): List[String] = {
     List(arg1)
@@ -170,10 +171,18 @@ s"${jan.name}"
 .pull-left[
 ```tut:silent
 case class City(name: String)
-case class Address(street: String, city: City, postcode: Int)
+case class Address(
+    street: String,
+    city: City,
+    postcode: Int
+)
 ```
 ```tut
-val addr = Address("sw. marcin", City("poznan"), 61022)
+val addr = Address(
+    street = "sw. marcin",
+    city = City("poznan"),
+    postcode = 61022
+)
 ```
 ]
 --
@@ -246,7 +255,10 @@ case class Uri(proto: Scheme, host: String, port: Int) {
 ```tut:nofail
 val google = Uri(Http, "google.pl", 80)
 
-val service = Uri(Other("service"), "mskip-service", 80)
+val service = Uri(
+    Other("service"),
+    "mskip-service",
+    80)
 ```
 ]
 
@@ -281,13 +293,13 @@ val i = Task(123)
 .pull-left[
 ```tut
 val pair = ("maciej", false)
-val tripple = ("maciej", true, 38)
-val tripple2 = Tuple3("maciej", true, 38)
+val pair2 = "maciej" -> false
+val pair3 = Tuple2("maciej", false)
 ```
 
 ```tut
-val pair2 = "maciej" -> false
-val pair3 = Tuple2("maciej", false)
+val tripple = ("maciej", true, 38)
+val tripple2 = Tuple3("maciej", true, 38)
 ```
 ]
 --
@@ -295,10 +307,11 @@ val pair3 = Tuple2("maciej", false)
 ```tut:nofail
 pair == pair2
 
-pair
-
 pair._1
 pair._2
+```
+
+```tut:nofail
 tripple._3
 ```
 ]
@@ -367,18 +380,14 @@ class: center, middle
 <a href="https://www.scala-exercises.org/std_lib/partially_applied_functions" target="_blank">Exercises</a>
 ---
 # Curried functions
-.pull-left[
 ```tut
 val head: String => List[String] => String =
   first
 ```
-]
 --
-.pull-right[
 ```tut:nofail
 val shead2 = head("")
 ```
-]
 ---
 # Implicit arguments
 
@@ -480,11 +489,6 @@ val l1 = List(1,2,3,4)
 val l2 = 1 :: 2 :: 3 :: 4 :: Nil
 ```
 ]
---
-.pull-right[
-```tut:nofail
-```
-]
 
 ---
 # Map
@@ -497,12 +501,6 @@ val m1 = Map(
 )
 ```
 ]
---
-.pull-right[
-```tut:nofail
-```
-]
-
 ---
 # Extension methods
 .pull-left[
