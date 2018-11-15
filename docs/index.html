@@ -113,7 +113,7 @@ class TaskImpl extends Task {
 .pull-right[
 ```scala
 scala> val task = new TaskImpl
-task: TaskImpl = TaskImpl@612e0370
+task: TaskImpl = TaskImpl@6d7e208
 
 scala> task.run("arg1")
 res2: List[String] = List(arg1)
@@ -154,7 +154,7 @@ scala> val p3 = Person.jacek
 p3: Person = Person(jacek)
 
 scala> val p4 = Person
-p4: Person.type = Person$@546a3955
+p4: Person.type = Person$@555be650
 
 scala> p4 eq Person
 res4: Boolean = true
@@ -178,10 +178,10 @@ object User {
 .pull-right[
 ```scala
 scala> val jan1 = User.apply("jan")
-jan1: User = User@1620a33b
+jan1: User = User@20f63674
 
 scala> val jan = User("jan")
-jan: User = User@22108b6f
+jan: User = User@48ed79a8
 
 scala> s"${jan.name}"
 res5: String = jan
@@ -422,7 +422,7 @@ first: [A](a: A)(l: List[A])A
 .pull-right[
 ```scala
 scala> val shead = first("") _
-shead: List[String] => String = $$Lambda$4530/790914357@3db112c3
+shead: List[String] => String = $$Lambda$4545/611730721@4658742e
 
 scala> shead(List())
 res18: String = ""
@@ -441,12 +441,12 @@ class: center, middle
 ```scala
 scala> val head: String => List[String] => String =
      |   first
-head: String => (List[String] => String) = $$Lambda$4544/1740742872@71339518
+head: String => (List[String] => String) = $$Lambda$4559/1618112691@3486f523
 ```
 --
 ```scala
 scala> val shead2 = head("")
-shead2: List[String] => String = $$Lambda$4545/438355811@1bdd495c
+shead2: List[String] => String = $$Lambda$4560/195566904@7bf24a81
 ```
 ---
 # Implicit arguments
@@ -558,17 +558,22 @@ yessss: Product with Serializable with Try[String] = Success(got result)
 ]
 
 ---
-# Lists
-.pull-left[
+# Collections
 ```scala
 val l1 = List(1,2,3,4)
 val l2 = 1 :: 2 :: 3 :: 4 :: Nil
 ```
-]
 
+--
+<br/>
+.pull-left[
+<a href="https://www.scala-exercises.org/std_lib/lists" target="_blank">Exercise 1</a><br>
+<a href="https://www.scala-exercises.org/std_lib/sequences_and_arrays" target="_blank">Exercise 2</a><br/>
+<a href="https://www.scala-exercises.org/std_lib/iterables" target="_blank">Exercise 3</a>
+]
 ---
 # Map
-.pull-left[
+
 ```scala
 val m1 = Map(
   "key1" -> 1,
@@ -576,77 +581,23 @@ val m1 = Map(
   ("key3", 3)
 )
 ```
-]
+
+--
+<a href="https://www.scala-exercises.org/std_lib/maps" target="_blank">Exercises</a>
 ---
-# Extension methods
-.pull-left[
-```scala
-object Syntax {
-  implicit class TrimSyntax(val s: String) extends AnyVal {
-    def bark(): String =
-      s"$s woff"
-  }
-}
-```
-]
---
-.pull-right[
-```scala
-scala> "a dog sais".bark()
-<console>:16: error: value bark is not a member of String
-       "a dog sais".bark()
-                    ^
-```
-]
---
-.pull-right[
-```scala
-scala> import Syntax._
-import Syntax._
+# Advanced topics
 
-scala> "a dog sais".bark()
-res22: String = a dog sais woff
-```
-]
----
-# Typeclasses / Adhoc Polimorphism
-```scala
-trait Show[T] {
-  def show(t: T): String
-}
-```
---
-```scala
-object Show {
-  implicit class ShowSyntax[T](val t: T) {
-    def show(implicit s: Show[T]): String =
-      s.show(t)
-  }
-}
-```
----
-# Higher Kinded Types
+* Type variance
 
-```scala
-type F[A] = Option[E]
-type F[A] = Either[E, A] // for some type E
-type F[A] = List[A]
-type F[A] = Future[A]
+* Higher kinded types
 
-```
---
-```scala
-trait Functor[F[_]] {
-  def map[A, B](fn: A => B)(f: F[A]): F[B]
-}
-object Functor {
-  implicit class FunctorSyntax[A, F[_]](val f: F[A]) extends AnyVal {
-    def map[B](fn: A => B)(implicit functor: Functor[F]): F[B] =
-      functor.map(fn)(f)
-  }
-}
-```
+* Typeclasses / Adhoc Polimorphism
 
+* FP patterns ( Functor, Applicative, Monad )
+
+* Recursion schemes
+
+* Generic programming
 ---
 class: center, middle
 
@@ -655,7 +606,7 @@ Code and slides at <a href="https://github.com/fkowal/scala-intro">`fkowal/scala
 
 
 
- </textarea>
+</textarea>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js">
 </script>
 <script>
